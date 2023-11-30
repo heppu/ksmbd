@@ -2258,13 +2258,16 @@ bool ksmbd_rdma_capable_netdev(struct net_device *netdev)
 	struct smb_direct_device *smb_dev;
 	int i;
 	bool rdma_capable = false;
+	ksmbd_debug(RDMA, "ksmbd_rdma_capable_netdev: %s\n", netdev->name);
 
 	read_lock(&smb_direct_device_lock);
 	list_for_each_entry(smb_dev, &smb_direct_device_list, list) {
 		for (i = 0; i < smb_dev->ib_dev->phys_port_cnt; i++) {
+			ksmbd_debug(RDMA, "Cabable: %s\n", smb_dev->ib_dev);
 			struct net_device *ndev;
 
 			if (smb_dev->ib_dev->ops.get_netdev) {
+				ksmbd_debug(RDMA, "IF\n");
 				ndev = smb_dev->ib_dev->ops.get_netdev(
 					smb_dev->ib_dev, i + 1);
 				if (!ndev)
@@ -2280,6 +2283,7 @@ bool ksmbd_rdma_capable_netdev(struct net_device *netdev)
 			 * check for matching infiniband GUID in hw_addr
 			 */
 			} else if (netdev->type == ARPHRD_INFINIBAND) {
+				ksmbd_debug(RDMA, "ELSE\n");
 				struct netdev_hw_addr *ha;
 				union ib_gid gid;
 				u32 port_num;
